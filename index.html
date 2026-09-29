@@ -1,12 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
   <meta charset="UTF-8">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+     content="width=device-width, initial-scale=1.0">
 
   <title>ETTC/BZA MESS QR Scanner</title>
 
@@ -107,6 +108,25 @@
       width: 120px;
     }
 
+    .token-box {
+      margin-top: 15px;
+      display: none;
+    }
+
+    .token-label {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .token {
+      background: #f1f3f5;
+      padding: 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
     .button {
       width: 100%;
       margin-top: 15px;
@@ -132,87 +152,102 @@
 
 </head>
 
-
 <body>
 
 <div class="container">
 
   <div class="header">
 
-    <h2>ETTC/BZA MESS</h2>
 
-    <p>QR Meal Scanner</p>
+<h2>ETTC/BZA MESS</h2>
+
+<p>QR Meal Scanner</p>
+
 
   </div>
 
-
   <div class="card">
 
-    <div id="reader"></div>
+
+<div id="reader"></div>
 
 
-    <div id="scanStatus"
-         class="status">
-    </div>
+<div id="scanStatus"
+     class="status">
+</div>
 
 
-    <div id="details"
-         class="details">
+<div id="details"
+     class="details">
 
-      <div class="detail-row">
-        <span class="detail-label">Employee:</span>
-        <span id="employeeName"></span>
-      </div>
+  <div class="detail-row">
+    <span class="detail-label">Employee:</span>
+    <span id="employeeName"></span>
+  </div>
 
-      <div class="detail-row">
-        <span class="detail-label">Employee ID:</span>
-        <span id="employeeId"></span>
-      </div>
+  <div class="detail-row">
+    <span class="detail-label">Employee ID:</span>
+    <span id="employeeId"></span>
+  </div>
 
-      <div class="detail-row">
-        <span class="detail-label">Designation:</span>
-        <span id="designation"></span>
-      </div>
+  <div class="detail-row">
+    <span class="detail-label">Designation:</span>
+    <span id="designation"></span>
+  </div>
 
-      <div class="detail-row">
-        <span class="detail-label">Batch:</span>
-        <span id="batchNo"></span>
-      </div>
+  <div class="detail-row">
+    <span class="detail-label">Batch:</span>
+    <span id="batchNo"></span>
+  </div>
 
-      <div class="detail-row">
-        <span class="detail-label">Training:</span>
-        <span id="fromDate"></span>
-        &nbsp;to&nbsp;
-        <span id="toDate"></span>
-      </div>
+  <div class="detail-row">
+    <span class="detail-label">Training:</span>
+    <span id="fromDate"></span>
+    &nbsp;to&nbsp;
+    <span id="toDate"></span>
+  </div>
 
-      <div class="detail-row">
-        <span class="detail-label">Accommodation:</span>
-        <span id="accommodation"></span>
-      </div>
-
-    </div>
-
-
-    <button class="button"
-            onclick="restartScanner()">
-
-      SCAN NEXT QR
-
-    </button>
-
-
-    <div class="instruction">
-
-      Ask the employee to show their QR code
-      inside the scanning area.
-
-    </div>
-
+  <div class="detail-row">
+    <span class="detail-label">Status:</span>
+    <span id="trainingStatus"></span>
   </div>
 
 </div>
 
+
+<div id="tokenBox"
+     class="token-box">
+
+  <div class="token-label">
+    Scanned QR Token
+  </div>
+
+  <div id="token"
+       class="token">
+  </div>
+
+</div>
+
+
+<button class="button"
+        onclick="restartScanner()">
+
+  SCAN NEXT QR
+
+</button>
+
+
+<div class="instruction">
+
+  Ask the employee to show their QR code
+  inside the scanning area.
+
+</div>
+
+
+  </div>
+
+</div>
 
 <script>
 
@@ -266,6 +301,28 @@
       "none";
 
 
+    document.getElementById("tokenBox").style.display =
+      "none";
+
+
+    document.getElementById("token").textContent =
+      "";
+
+  }
+
+
+  // -----------------------------------------
+  // DISPLAY TOKEN
+  // -----------------------------------------
+
+  function showToken(token) {
+
+    document.getElementById("token").textContent =
+      token;
+
+    document.getElementById("tokenBox").style.display =
+      "block";
+
   }
 
 
@@ -293,16 +350,9 @@
     document.getElementById("toDate").textContent =
       result.toDate || "";
 
-    document.getElementById("accommodation").textContent =
-      result.accommodation
-        ? result.accommodation +
-          (
-            result.hostelRoom
-              ? " - " + result.hostelRoom
-              : ""
-          )
-        : "";
-    
+    document.getElementById("trainingStatus").textContent =
+      result.status || "";
+
     document.getElementById("details").style.display =
       "block";
 
@@ -423,7 +473,10 @@
       decodedText;
 
 
-     stopScanner();
+    showToken(decodedText);
+
+
+    stopScanner();
 
 
     validateToken(decodedText);
