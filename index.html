@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
   <meta charset="UTF-8">
 
-<meta name="viewport"
-     content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <title>ETTC/BZA MESS QR Scanner</title>
 
@@ -85,6 +84,29 @@
       border: 1px solid #df9999;
     }
 
+    .info {
+      display: block;
+      background: #e7f0fa;
+      color: #1f4e78;
+      border: 1px solid #a8c4df;
+    }
+
+    .details {
+      margin-top: 15px;
+      display: none;
+    }
+
+    .detail-row {
+      padding: 9px 0;
+      border-bottom: 1px solid #eeeeee;
+    }
+
+    .detail-label {
+      font-weight: bold;
+      display: inline-block;
+      width: 120px;
+    }
+
     .token-box {
       margin-top: 15px;
       display: none;
@@ -101,7 +123,7 @@
       border-radius: 8px;
       word-break: break-all;
       font-family: monospace;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .button {
@@ -129,66 +151,111 @@
 
 </head>
 
+
 <body>
 
 <div class="container">
 
   <div class="header">
 
+    <h2>ETTC/BZA MESS</h2>
 
-<h2>ETTC/BZA MESS</h2>
-
-<p>QR Meal Scanner</p>
-
+    <p>QR Meal Scanner</p>
 
   </div>
+
 
   <div class="card">
 
-
-<div id="reader"></div>
-
-
-<div id="scanStatus"
-     class="status">
-</div>
+    <div id="reader"></div>
 
 
-<div id="tokenBox"
-     class="token-box">
+    <div id="scanStatus"
+         class="status">
+    </div>
 
-  <div class="token-label">
-    Scanned QR Token
+
+    <div id="details"
+         class="details">
+
+      <div class="detail-row">
+        <span class="detail-label">Employee:</span>
+        <span id="employeeName"></span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Employee ID:</span>
+        <span id="employeeId"></span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Designation:</span>
+        <span id="designation"></span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Batch:</span>
+        <span id="batchNo"></span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Training:</span>
+        <span id="fromDate"></span>
+        &nbsp;to&nbsp;
+        <span id="toDate"></span>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Status:</span>
+        <span id="trainingStatus"></span>
+      </div>
+
+    </div>
+
+
+    <div id="tokenBox"
+         class="token-box">
+
+      <div class="token-label">
+        Scanned QR Token
+      </div>
+
+      <div id="token"
+           class="token">
+      </div>
+
+    </div>
+
+
+    <button class="button"
+            onclick="restartScanner()">
+
+      SCAN NEXT QR
+
+    </button>
+
+
+    <div class="instruction">
+
+      Ask the employee to show their QR code
+      inside the scanning area.
+
+    </div>
+
   </div>
 
-  <div id="token"
-       class="token">
-  </div>
-
 </div>
 
-
-<button class="button"
-        onclick="restartScanner()">
-
-  SCAN NEXT QR
-
-</button>
-
-
-<div class="instruction">
-
-  Ask the employee to show their QR code
-  inside the scanning area.
-
-</div>
-
-
-  </div>
-
-</div>
 
 <script>
+
+  // -----------------------------------------
+  // YOUR APPS SCRIPT WEB APP URL
+  // -----------------------------------------
+
+  const APPS_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycby_wTSOhhchj39RALek8HkMWszkz_WCK0ECJwaSuxG_jk4Pg1c0uqWpZlDyf5421wBLmw/exec";
+
 
   let scanner = null;
 
@@ -197,18 +264,54 @@
   let lastScannedToken = "";
 
 
+  // -----------------------------------------
+  // STATUS
+  // -----------------------------------------
+
   function showStatus(message, type) {
 
     const status =
       document.getElementById("scanStatus");
 
-    status.textContent = message;
+    status.textContent =
+      message;
 
     status.className =
       "status " + type;
 
   }
 
+
+  // -----------------------------------------
+  // CLEAR RESULT
+  // -----------------------------------------
+
+  function clearResult() {
+
+    document.getElementById("scanStatus").textContent =
+      "";
+
+    document.getElementById("scanStatus").className =
+      "status";
+
+
+    document.getElementById("details").style.display =
+      "none";
+
+
+    document.getElementById("tokenBox").style.display =
+      "none";
+
+
+    document.getElementById("token").textContent =
+      "";
+
+  }
+
+
+  // -----------------------------------------
+  // DISPLAY TOKEN
+  // -----------------------------------------
 
   function showToken(token) {
 
@@ -221,22 +324,136 @@
   }
 
 
-  function clearResult() {
+  // -----------------------------------------
+  // DISPLAY TRAINING DETAILS
+  // -----------------------------------------
 
-    document.getElementById("scanStatus").textContent =
-      "";
+  function showTrainingDetails(result) {
 
-    document.getElementById("scanStatus").className =
-      "status";
+    document.getElementById("employeeName").textContent =
+      result.employeeName || "";
 
-    document.getElementById("token").textContent =
-      "";
+    document.getElementById("employeeId").textContent =
+      result.employeeId || "";
 
-    document.getElementById("tokenBox").style.display =
-      "none";
+    document.getElementById("designation").textContent =
+      result.designation || "";
+
+    document.getElementById("batchNo").textContent =
+      result.batchNo || "";
+
+    document.getElementById("fromDate").textContent =
+      result.fromDate || "";
+
+    document.getElementById("toDate").textContent =
+      result.toDate || "";
+
+    document.getElementById("trainingStatus").textContent =
+      result.status || "";
+
+    document.getElementById("details").style.display =
+      "block";
 
   }
 
+
+  // -----------------------------------------
+  // GLOBAL JSONP CALLBACK
+  // -----------------------------------------
+
+  window.qrValidationCallback =
+    function(result) {
+
+      if (!result) {
+
+        showStatus(
+          "No response received from server.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      if (!result.success) {
+
+        showStatus(
+          result.message ||
+          "QR validation failed.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      showTrainingDetails(result);
+
+
+      showStatus(
+        "QR VALIDATED SUCCESSFULLY",
+        "success"
+      );
+
+    };
+
+
+  // -----------------------------------------
+  // SEND TOKEN TO APPS SCRIPT
+  // -----------------------------------------
+
+  function validateToken(token) {
+
+    showStatus(
+      "Checking QR...",
+      "info"
+    );
+
+
+    const script =
+      document.createElement("script");
+
+
+    const url =
+      APPS_SCRIPT_URL +
+      "?action=validateQR" +
+      "&token=" +
+      encodeURIComponent(token) +
+      "&callback=qrValidationCallback";
+
+
+    script.src = url;
+
+
+    script.onerror = function() {
+
+      showStatus(
+        "Unable to connect to MESS server.",
+        "error"
+      );
+
+      script.remove();
+
+    };
+
+
+    document.body.appendChild(script);
+
+
+    setTimeout(function() {
+
+      script.remove();
+
+    }, 10000);
+
+  }
+
+
+  // -----------------------------------------
+  // QR SUCCESS
+  // -----------------------------------------
 
   function onScanSuccess(decodedText, decodedResult) {
 
@@ -250,29 +467,35 @@
     }
 
 
-    lastScannedToken = decodedText;
+    lastScannedToken =
+      decodedText;
 
 
     showToken(decodedText);
 
 
-    showStatus(
-      "QR SCANNED SUCCESSFULLY",
-      "success"
-    );
-
-
     stopScanner();
+
+
+    validateToken(decodedText);
 
   }
 
+
+  // -----------------------------------------
+  // QR FAILURE
+  // -----------------------------------------
 
   function onScanFailure(error) {
 
-    // Normal scanning failures are ignored.
+    // Normal scanning failures ignored.
 
   }
 
+
+  // -----------------------------------------
+  // START SCANNER
+  // -----------------------------------------
 
   function startScanner() {
 
@@ -308,8 +531,11 @@
 
 
         return {
+
           width: size,
+
           height: size
+
         };
 
       },
@@ -332,11 +558,13 @@
       onScanFailure
 
     )
+
     .then(function() {
 
       scannerRunning = true;
 
     })
+
     .catch(function(error) {
 
       scannerRunning = false;
@@ -351,6 +579,10 @@
   }
 
 
+  // -----------------------------------------
+  // STOP SCANNER
+  // -----------------------------------------
+
   function stopScanner() {
 
     if (!scanner || !scannerRunning) {
@@ -359,11 +591,13 @@
 
 
     scanner.stop()
+
       .then(function() {
 
         scannerRunning = false;
 
       })
+
       .catch(function(error) {
 
         scannerRunning = false;
@@ -372,6 +606,10 @@
 
   }
 
+
+  // -----------------------------------------
+  // SCAN NEXT QR
+  // -----------------------------------------
 
   function restartScanner() {
 
@@ -391,6 +629,10 @@
   }
 
 
+  // -----------------------------------------
+  // START
+  // -----------------------------------------
+
   window.onload = function() {
 
     startScanner();
@@ -402,4 +644,3 @@
 </body>
 
 </html>
-
