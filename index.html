@@ -213,20 +213,6 @@
     </div>
 
 
-    <div id="tokenBox"
-         class="token-box">
-
-      <div class="token-label">
-        Scanned QR Token
-      </div>
-
-      <div id="token"
-           class="token">
-      </div>
-
-    </div>
-
-
     <button class="button"
             onclick="restartScanner()">
 
@@ -298,28 +284,6 @@
     document.getElementById("details").style.display =
       "none";
 
-
-    document.getElementById("tokenBox").style.display =
-      "none";
-
-
-    document.getElementById("token").textContent =
-      "";
-
-  }
-
-
-  // -----------------------------------------
-  // DISPLAY TOKEN
-  // -----------------------------------------
-
-  function showToken(token) {
-
-    document.getElementById("token").textContent =
-      token;
-
-    document.getElementById("tokenBox").style.display =
-      "block";
 
   }
 
@@ -478,10 +442,7 @@
       decodedText;
 
 
-    showToken(decodedText);
-
-
-    stopScanner();
+     stopScanner();
 
 
     validateToken(decodedText);
