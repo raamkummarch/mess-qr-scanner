@@ -568,16 +568,15 @@
     })
 
     .catch(function(error) {
-
+    
       scannerRunning = false;
-
+    
       showStatus(
-        "Unable to open camera. Please allow camera permission.",
+        "Camera error: " + error,
         "error"
       );
-
+    
     });
-
   }
 
 
