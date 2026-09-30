@@ -345,10 +345,10 @@
       showTrainingDetails(result);
       
       showStatus(
-        "MEAL TIME VALID - " + result.meal,
-        "success"
+        result.message || "MEAL TIME VALID - " + result.meal,
+        result.success ? "success" : "error"
       );
-
+    
     };
 
 
